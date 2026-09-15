@@ -1,0 +1,14 @@
+{
+  "name": "pocket-cash-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A private, local cash tracker for PC and mobile",
+  "engines": { "node": ">=24.0.0" },
+  "scripts": {
+    "start": "node server.mjs",
+    "set-pin": "node scripts/set-pin.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check server.mjs && node --check lib/ledger.mjs && node --check lib/store.mjs && node --check public/app.js"
+  }
+}

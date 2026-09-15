@@ -1,0 +1,15 @@
+data/
+backups/
+.test-data/
+*.log
+*.pid
+.env
+.env.*
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-wal
+*.db-shm
+node_modules/
+artifacts/

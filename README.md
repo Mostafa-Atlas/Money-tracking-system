@@ -5,7 +5,7 @@
 ![Deps](https://img.shields.io/badge/dependencies-0-blue)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-A private physical-cash tracker for PC and mobile. English, EGP, Cairo time, Sunday-first weeks. Runs locally with **zero npm dependencies** — just Node.js + SQLite + vanilla HTML/CSS/JS.
+A private physical-cash tracker for PC and mobile. Works in your currency, Cairo time, Sunday-first weeks. Runs locally with **zero npm dependencies** — just Node.js + SQLite + vanilla HTML/CSS/JS.
 
 > **Portfolio note:** I built this to track real cash reliably offline, with correct money math, safe concurrent edits, and restorable backups. No frameworks, no cloud, no tracking.
 
@@ -22,6 +22,7 @@ See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for how I captured them with the 
 ## Features
 
 - Cash in hand, Add Expense / Add Money, period summary, categories, recent activity
+- Choose your currency at first launch (EGP, USD, EUR, GBP, SAR, AED + more); change the label later in Settings
 - Analysis: net spent, refunds, largest category, category breakdown, daily spending, balance over time, lesson subjects
 - History: search + filters (date, category, subject, type), edit / delete / refund with revision-conflict protection
 - Corrections preserve original timestamps; balance corrections are visible adjustments excluded from spending totals
@@ -69,7 +70,7 @@ node scripts/set-pin.mjs
 node server.mjs
 ```
 
-Visit http://127.0.0.1:4310, enter your PIN, set your opening cash. That's it — no `npm install`.
+Visit http://127.0.0.1:4310, enter your PIN, choose your currency and set your opening cash. That's it — no `npm install`.
 
 | Command | Purpose |
 | --- | --- |
@@ -106,7 +107,7 @@ Then start Pocket:
 node server.mjs
 ```
 
-Keep the terminal open. Visit [Pocket on this PC](http://127.0.0.1:4310), enter your PIN, and set the physical cash you currently have as your opening balance. Each unlocked browser is remembered for 24 hours.
+Keep the terminal open. Visit [Pocket on this PC](http://127.0.0.1:4310), enter your PIN, choose your currency, and set the physical cash you currently have as your opening balance. Each unlocked browser is remembered for 24 hours.
 
 **Already set up on this PC?** Skip the clone and PIN-setup steps. Run `node server.mjs` from the existing project folder.
 

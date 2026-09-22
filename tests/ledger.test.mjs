@@ -117,3 +117,22 @@ test('many exact decimal expenses never accumulate float rounding error', () => 
   for (let i = 0; i < 100; i++) l.act('expense', { amount: '0.10', categoryId: 'food' });
   assert.equal(balance(l.state), 0); assert.equal(analytics(l.state, {}, MONDAY).spent, 1000);
 });
+test('opening sets currency; invalid codes rejected; currency can be relabelled later', () => {
+  const l = ledger();
+  assert.throws(() => l.act('opening', { amount: '100', currency: 'XX' }), /currency/i);
+  l.act('opening', { amount: '100', currency: 'USD' });
+  assert.equal(l.state.currency, 'USD');
+  assert.equal(balance(l.state), 10000);
+  assert.throws(() => l.act('currency', { currency: 'XX' }), /currency/i);
+  assert.throws(() => l.act('currency', { currency: 'USD' }), /already selected/);
+  l.act('currency', { currency: 'EUR' });
+  assert.equal(l.state.currency, 'EUR');
+  assert.equal(balance(l.state), 10000); // relabel only, amounts untouched
+});
+test('legacy states without currency default to EGP', () => {
+  const l = ledger(); l.act('opening', { amount: '50' });
+  assert.equal(l.state.currency, 'EGP');
+  const legacy = structuredClone(l.state); delete legacy.currency;
+  validateState(legacy);
+  assert.equal(legacy.currency, 'EGP');
+});

@@ -66,7 +66,7 @@ export function createApp({ dataDir = join(root, 'data'), backupDir = join(root,
       if (url.pathname === '/api/logout' && req.method === 'POST') { store.logout(cookie(req)); res.setHeader('Set-Cookie', 'pocket_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'); json(200, { ok: true }); return; }
       const filters = Object.fromEntries(url.searchParams);
       if (url.pathname === '/api/state' && req.method === 'GET') {
-        const state = store.state(); json(200, { revision: state.revision, initialized: state.initialized, balance: balance(state), categories: state.categories, subjects: state.subjects, today: dateKey(new Date(clock()).toISOString()), timezone: 'Africa/Cairo' }); return;
+        const state = store.state(); json(200, { revision: state.revision, initialized: state.initialized, currency: state.currency || 'EGP', balance: balance(state), categories: state.categories, subjects: state.subjects, today: dateKey(new Date(clock()).toISOString()), timezone: 'Africa/Cairo' }); return;
       }
       if (url.pathname === '/api/analytics' && req.method === 'GET') { json(200, analytics(store.state(), filters, new Date(clock()).toISOString())); return; }
       if (url.pathname === '/api/history' && req.method === 'GET') { json(200, history(store.state(), filters)); return; }

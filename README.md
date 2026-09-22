@@ -1,14 +1,91 @@
-# Pocket
+# Pocket — offline-first cash tracker
 
-A private physical-cash tracker for PC and mobile. English, EGP, Cairo time, Sunday-first weeks.
+[![CI](https://github.com/Mostafa-Atlas/Money-tracking-system-/actions/workflows/ci.yml/badge.svg)](https://github.com/Mostafa-Atlas/Money-tracking-system-/actions/workflows/ci.yml)
+![Node](https://img.shields.io/badge/node-%3E%3D24-brightgreen)
+![Deps](https://img.shields.io/badge/dependencies-0-blue)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
+
+A private physical-cash tracker for PC and mobile. English, EGP, Cairo time, Sunday-first weeks. Runs locally with **zero npm dependencies** — just Node.js + SQLite + vanilla HTML/CSS/JS.
+
+> **Portfolio note:** I built this to track real cash reliably offline, with correct money math, safe concurrent edits, and restorable backups. No frameworks, no cloud, no tracking.
+
+## Screenshots
+
+> Add 3 screenshots to `docs/screenshots/` and link them here. Suggested: Home (desktop), Analysis (desktop), Home (mobile 390px).
+
+| Home | Analysis | Mobile |
+| --- | --- | --- |
+| `docs/screenshots/home-desktop.png` | `docs/screenshots/analysis-desktop.png` | `docs/screenshots/home-mobile.png` |
+
+See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for how I captured them with the disposable preview database.
+
+## Features
+
+- Cash in hand, Add Expense / Add Money, period summary, categories, recent activity
+- Analysis: net spent, refunds, largest category, category breakdown, daily spending, balance over time, lesson subjects
+- History: search + filters (date, category, subject, type), edit / delete / refund with revision-conflict protection
+- Corrections preserve original timestamps; balance corrections are visible adjustments excluded from spending totals
+- Refunds link to an expense, can be partial, never exceed the expense; counted on return date
+- Categories / lesson subjects: add, rename, archive, delete-only-when-unused
+- PIN auth (salted scrypt hash), 24h HttpOnly SameSite sessions, rate-limited login, same-origin + custom-header mutation guard
+- Backups: automatic weekly (keep 8), manual snapshots, download/upload JSON, checksum-validated restore with pre-restore recovery copy
+- PWA-ready, mobile bottom tabs + bottom-sheet expense form, desktop sidebar + dialog, keyboard + reduced-motion + touch friendly
+
+## Tech stack
+
+- **Runtime:** Node.js 24+ (uses built-in `node:http`, `node:sqlite`, `node:crypto`, `node:test` — that's why Node 24 is required)
+- **Frontend:** plain HTML / CSS / JavaScript + inline SVG charts, no CDN, no frameworks
+- **Storage:** SQLite locally (`data/pocket.sqlite`), money as integer piastres, atomic mutations, chronological non-negative ledger validation
+- **Tests:** `node --test` — 25 tests for ledger math, refunds, auth, HTTP, concurrency, backup/restore, persistence
+
+## Architecture
+
+```text
+browser (vanilla JS + SVG)
+   │  same-origin JSON, x-pocket-request: 1, session cookie
+   ▼
+server.mjs (built-in http, CSP + host allowlist + Tailscale bind)
+   │  lib/store.mjs (SQLite persistence, sessions, backups)
+   │  lib/ledger.mjs (pure money rules: balance, analytics, history)
+   ▼
+data/pocket.sqlite (ignored by git) + backups/*.json (ignored by git)
+```
+
+Key decisions:
+- Integer piastres everywhere — no float rounding (covered by a dedicated test with many decimal expenses).
+- Server is source of truth; no offline queue that lies about saving.
+- Cairo (`Africa/Cairo`) boundaries, Sunday-first weeks.
+- Listens on loopback + detected Tailscale IPv4 only, never LAN/WAN by default.
+
+## Quickstart
+
+Requirements: **Node.js 24+**, Git. Optional: Tailscale on both devices for phone access.
+
+```powershell
+git clone https://github.com/Mostafa-Atlas/Money-tracking-system-.git
+cd Money-tracking-system-
+node --version
+node scripts/set-pin.mjs
+node server.mjs
+```
+
+Visit http://127.0.0.1:4310, enter your PIN, set your opening cash. That's it — no `npm install`.
+
+| Command | Purpose |
+| --- | --- |
+| `node server.mjs` / `npm start` | run production server |
+| `node scripts/set-pin.mjs` / `npm run set-pin` | create / recover PIN (invalidates sessions) |
+| `node --test tests/*.test.mjs` / `npm test` | run 25 isolated temp-DB tests |
+| `npm run check` | JS syntax checks |
+| `node scripts/ui-preview.mjs` / `npm run preview` | disposable browser-testing app on :4311 with test PIN `24682468` |
 
 ## Requirements
 
-- **Node.js 24 or newer**, available in your terminal as `node`.
+- **Node.js 24 or newer**, available in your terminal as `node`. Needed for the built-in `node:sqlite` module — no dependencies to install.
 - **Git** to clone the repository (or download and extract its ZIP from GitHub).
 - **Tailscale on both devices**, signed into the same Tailnet, for phone access.
 
-There are no third-party npm dependencies. **You do not need to run `npm install`.** All fonts, styles, scripts, and icons are served locally.
+There are no third-party npm dependencies. **You do not need to run `npm install`.** All fonts, styles, scripts, and icons are served locally. Use `nvm use` / `fnm use` with the included `.nvmrc` if you use a version manager.
 
 ## First-time setup
 
@@ -35,7 +112,7 @@ Keep the terminal open. Visit [Pocket on this PC](http://127.0.0.1:4310), enter 
 
 ## Everyday start and stop
 
-On Windows, double-click **[start-pocket.cmd](start-pocket.cmd)**. Alternatively, run `node server.mjs` from the project directory. `npm start` is an equivalent option when npm is working.
+On Windows, double-click **[start-pocket.cmd](start-pocket.cmd)**. On macOS/Linux, run `./start-pocket.sh` (first time: `chmod +x start-pocket.sh`). Alternatively, run `node server.mjs` from the project directory. `npm start` is an equivalent option when npm is working.
 
 Press **Ctrl+C** in the server terminal to stop Pocket. Your saved records remain on disk. Launch it again when you need it; the app does not register itself to start with Windows.
 
@@ -95,20 +172,21 @@ Run `node scripts/set-pin.mjs` (or `npm run set-pin`) on the PC to choose a new 
 
 - `node --test tests/ledger.test.mjs tests/server.test.mjs` (or `npm test`): isolated temporary-database tests for ledger, dates, authentication, HTTP, concurrent edits, backup/restore, and persistence.
 - `npm run check`: JavaScript syntax checks.
-- `instructions.md`: agreed scope and implementation constraints.
-- `progress.md`: current status, verification evidence, and limitations.
-
-For a separate, disposable browser-testing app:
-
-```powershell
-node scripts/ui-preview.mjs
-```
-
-It listens only at [the isolated preview](http://127.0.0.1:4311), uses `.test-data/`, and has the test-only PIN `24682468`. It never opens the production database. Stop it with Ctrl+C. Use the normal server, not this preview, for real cash records.
+- `npm run preview`: disposable browser-testing app on http://127.0.0.1:4311 with test PIN `24682468`, isolated `.test-data/`, never touches production.
 
 Implementation uses Node's built-in HTTP, SQLite, crypto, and test modules, with plain HTML/CSS/JavaScript and SVG. The SQLite module may print an experimental-feature warning in Node 24; it does not prevent startup. Everything needed by the frontend is local, without CDN or font downloads.
 
 Physical phone connectivity requires verification from the phone. Windows/Tailnet policy can still block access even when the PC's own Tailnet address responds; no firewall or Tailnet policy is changed automatically.
+
+## Roadmap
+
+- [ ] Screenshots + demo GIF in README
+- [ ] CSV export / import
+- [ ] Monthly budget targets with progress bar
+- [ ] Light theme toggle
+- [ ] Docker image for one-command self-host
+
+Contributions welcome — open an issue first to discuss scope. No external services or tracking will be accepted.
 
 ## Troubleshooting
 
@@ -122,3 +200,7 @@ Physical phone connectivity requires verification from the phone. Windows/Tailne
 | Phone cannot connect | Check that the PC is awake, the server is running, both devices are connected to the Tailnet, and you used the PC's Tailnet address. Then check Windows Firewall and Tailnet access policy for the chosen port. |
 | Data changed on another screen | Refresh to get the latest records before retrying the correction. |
 | Automatic backup failed | Check free disk space and write permission for the backup directory. |
+
+## License
+
+MIT — see [LICENSE](LICENSE).

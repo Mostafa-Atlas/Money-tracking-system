@@ -7,12 +7,12 @@
   "author": "Mostafa Atlas",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Mostafa-Atlas/Money-tracking-system-.git"
+    "url": "https://github.com/Mostafa-Atlas/pocket-cash-tracker.git"
   },
   "bugs": {
-    "url": "https://github.com/Mostafa-Atlas/Money-tracking-system-/issues"
+    "url": "https://github.com/Mostafa-Atlas/pocket-cash-tracker/issues"
   },
-  "homepage": "https://github.com/Mostafa-Atlas/Money-tracking-system-#readme",
+  "homepage": "https://github.com/Mostafa-Atlas/pocket-cash-tracker#readme",
   "keywords": ["nodejs", "sqlite", "vanilla-js", "pwa", "finance", "cash-tracker", "offline-first"],
   "engines": { "node": ">=24.0.0" },
   "scripts": {

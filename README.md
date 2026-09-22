@@ -1,6 +1,6 @@
 # Pocket — offline-first cash tracker
 
-[![CI](https://github.com/Mostafa-Atlas/Money-tracking-system-/actions/workflows/ci.yml/badge.svg)](https://github.com/Mostafa-Atlas/Money-tracking-system-/actions/workflows/ci.yml)
+[![CI](https://github.com/Mostafa-Atlas/pocket-cash-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/Mostafa-Atlas/pocket-cash-tracker/actions/workflows/ci.yml)
 ![Node](https://img.shields.io/badge/node-%3E%3D24-brightgreen)
 ![Deps](https://img.shields.io/badge/dependencies-0-blue)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -11,11 +11,11 @@ A private physical-cash tracker for PC and mobile. English, EGP, Cairo time, Sun
 
 ## Screenshots
 
-> Add 3 screenshots to `docs/screenshots/` and link them here. Suggested: Home (desktop), Analysis (desktop), Home (mobile 390px).
+Sample data from the disposable preview database.
 
-| Home | Analysis | Mobile |
-| --- | --- | --- |
-| `docs/screenshots/home-desktop.png` | `docs/screenshots/analysis-desktop.png` | `docs/screenshots/home-mobile.png` |
+![Home — desktop](docs/screenshots/home-desktop.png)
+![Analysis — desktop](docs/screenshots/analysis-desktop.png)
+![Home — mobile](docs/screenshots/home-mobile.png)
 
 See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for how I captured them with the disposable preview database.
 
@@ -62,8 +62,8 @@ Key decisions:
 Requirements: **Node.js 24+**, Git. Optional: Tailscale on both devices for phone access.
 
 ```powershell
-git clone https://github.com/Mostafa-Atlas/Money-tracking-system-.git
-cd Money-tracking-system-
+git clone https://github.com/Mostafa-Atlas/pocket-cash-tracker.git
+cd pocket-cash-tracker
 node --version
 node scripts/set-pin.mjs
 node server.mjs
@@ -92,8 +92,8 @@ There are no third-party npm dependencies. **You do not need to run `npm install
 Open PowerShell or a terminal and run:
 
 ```powershell
-git clone https://github.com/Mostafa-Atlas/Money-tracking-system-.git
-cd Money-tracking-system-
+git clone https://github.com/Mostafa-Atlas/pocket-cash-tracker.git
+cd pocket-cash-tracker
 node --version
 node scripts/set-pin.mjs
 ```

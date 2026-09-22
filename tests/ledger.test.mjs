@@ -136,3 +136,22 @@ test('legacy states without currency default to EGP', () => {
   validateState(legacy);
   assert.equal(legacy.currency, 'EGP');
 });
+test('opening sets timezone; invalid zones rejected; timezone can change later', () => {
+  const l = ledger();
+  assert.throws(() => l.act('opening', { amount: '100', currency: 'USD', timezone: 'Mars/Olympus' }), /timezone/i);
+  l.act('opening', { amount: '100', currency: 'USD', timezone: 'America/New_York' });
+  assert.equal(l.state.timezone, 'America/New_York');
+  assert.throws(() => l.act('timezone', { timezone: 'Not/AZone' }), /timezone/i);
+  assert.throws(() => l.act('timezone', { timezone: 'America/New_York' }), /already selected/);
+  l.act('timezone', { timezone: 'Europe/Paris' });
+  assert.equal(l.state.timezone, 'Europe/Paris');
+  assert.equal(balance(l.state), 10000);
+});
+test('legacy states without timezone default to Africa/Cairo; day boundaries follow zone', () => {
+  const l = ledger(); l.act('opening', { amount: '50' });
+  assert.equal(l.state.timezone, 'Africa/Cairo');
+  // 2026-09-14T22:30:00Z is still 14 Sept in Cairo (UTC+3) but 14 Sept in New York too at 18:30;
+  // use a UTC time that falls on different local days: 2026-09-14T01:30:00Z = 04:30 Cairo (14th), 21:30 NY 13th.
+  assert.equal(dateKey('2026-09-14T01:30:00.000Z', 'Africa/Cairo'), '2026-09-14');
+  assert.equal(dateKey('2026-09-14T01:30:00.000Z', 'America/New_York'), '2026-09-13');
+});

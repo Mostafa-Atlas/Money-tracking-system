@@ -66,10 +66,10 @@ export function createApp({ dataDir = join(root, 'data'), backupDir = join(root,
       if (url.pathname === '/api/logout' && req.method === 'POST') { store.logout(cookie(req)); res.setHeader('Set-Cookie', 'pocket_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'); json(200, { ok: true }); return; }
       const filters = Object.fromEntries(url.searchParams);
       if (url.pathname === '/api/state' && req.method === 'GET') {
-        const state = store.state(); json(200, { revision: state.revision, initialized: state.initialized, currency: state.currency || 'EGP', balance: balance(state), categories: state.categories, subjects: state.subjects, today: dateKey(new Date(clock()).toISOString()), timezone: 'Africa/Cairo' }); return;
+        const state = store.state(); json(200, { revision: state.revision, initialized: state.initialized, currency: state.currency || 'EGP', balance: balance(state), categories: state.categories, subjects: state.subjects, today: dateKey(new Date(clock()).toISOString(), state.timezone || 'Africa/Cairo'), timezone: state.timezone || 'Africa/Cairo' }); return;
       }
-      if (url.pathname === '/api/analytics' && req.method === 'GET') { json(200, analytics(store.state(), filters, new Date(clock()).toISOString())); return; }
-      if (url.pathname === '/api/history' && req.method === 'GET') { json(200, history(store.state(), filters)); return; }
+      if (url.pathname === '/api/analytics' && req.method === 'GET') { const s = store.state(); json(200, analytics(s, filters, new Date(clock()).toISOString(), s.timezone || 'Africa/Cairo')); return; }
+      if (url.pathname === '/api/history' && req.method === 'GET') { const s = store.state(); json(200, history(s, filters, s.timezone || 'Africa/Cairo')); return; }
       if (url.pathname === '/api/backups' && req.method === 'GET') { json(200, store.backupStatus()); return; }
       if (url.pathname === '/api/backup/download' && req.method === 'GET') {
         const backup = store.readBackup(filters.name); res.setHeader('Content-Disposition', `attachment; filename="${filters.name}"`); json(200, backup); return;
